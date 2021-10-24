@@ -23,37 +23,26 @@ namespace DataAccess
         private static IDatabase CreateRedisDB()
         {
 
-            string ErrorMessage = "";
             if (_db == null)
             {
-
-                try
-                {
-
-                    ConfigurationOptions option = new ConfigurationOptions();
-                    option.Ssl = false;
-                    option.EndPoints.Add(host, port);
-                    var connect = ConnectionMultiplexer.Connect(option);
-                    _db = connect.GetDatabase();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Maraba");
-                }
-
-
+                ConfigurationOptions option = new ConfigurationOptions();
+                option.Ssl = false;
+                option.EndPoints.Add(host, port);
+                var connect = ConnectionMultiplexer.Connect(option);
+                _db = connect.GetDatabase();
             }
 
             return _db;
         }
 
+        /// <summary>
+        /// Anahtarda depolanan set değerinin tüm üyelerini döndürür.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public T Get<T>(string key)
         {
-            if (_db.IsConnected(key) == true)
-            {
-                //throw new Exception();
-            }
-
             var rValue = _db.SetMembers(key);
             if (rValue.Length == 0)
                 return default(T);
@@ -62,11 +51,12 @@ namespace DataAccess
             return result;
         }
 
-        public bool IsSet(string key)
-        {
-            return _db.KeyExists(key);
-        }
-
+        /// <summary>
+        /// Belirtilen üyeyi anahtarda depolanan kümeden çıkarır.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool RemoveValue(string key, object data)
         {
             if (data == null)
@@ -81,6 +71,12 @@ namespace DataAccess
             return _db.KeyDelete(key);
         }
 
+        /// <summary>
+        /// Belirtilen üyeyi anahtarda saklanan kümeye ekler. 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public bool Set(string key, object data)
         {
             if (data == null)
@@ -88,13 +84,6 @@ namespace DataAccess
 
             var entryBytes = Serialize(data);
             return _db.SetAdd(key, entryBytes);
-
-
-            //  expire ;
-            // var expiresIn = TimeSpan.FromMinutes(cacheTime);
-
-            //if (cacheTime > 0)
-            //    _db.KeyExpire(key, expiresIn);
         }
 
 

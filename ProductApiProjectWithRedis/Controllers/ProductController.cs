@@ -19,6 +19,7 @@ namespace ProductApiProjectWithRedis.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
+            //redis'ten gelen veriyi Product listesi olarak alındı,başarılı kodu ile döndürüldü
             var product = _manager.Get<List<Product>>("products");
             if (product != null)
             {
@@ -31,6 +32,7 @@ namespace ProductApiProjectWithRedis.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
+            //id ye göre Product nesnesi döndürüldü
             var product = _manager.Get<List<Product>>("products").Where(c => c.Id == id).FirstOrDefault();
             if (product == null)
                 return StatusCode(403, new ErrorModel { ErrorMessage = String.Format(ERROR_MESSAGE, id) });
@@ -45,7 +47,7 @@ namespace ProductApiProjectWithRedis.Controllers
         public ActionResult Insert(Product product)
         {
 
-
+            //id identity olarak kullandım.Sku unique bir değer olarak aldım
             var vProductList = _manager.Get<List<Product>>("products");
 
             if (vProductList != null)
@@ -58,6 +60,7 @@ namespace ProductApiProjectWithRedis.Controllers
                 product.Id = 1;
             }
 
+            //eğer liste boş ise hata vermemesi için kontrol gerçekleştirdim.
             if (vProductList != null)
             {
                 var vProductSkuControl = vProductList.Where(c => c.Sku == product.Sku).FirstOrDefault();
@@ -80,10 +83,6 @@ namespace ProductApiProjectWithRedis.Controllers
             }
 
 
-
-
-
-
             return StatusCode(201);
 
         }
@@ -93,6 +92,9 @@ namespace ProductApiProjectWithRedis.Controllers
         public ActionResult Update(int id, [FromBody] Product product)
         {
 
+            //update işleminde girilen id'nin olup olmadığını kontrol ettim
+            //eğer var ise yeni girilen bilgilerin sku değerini kontrol ettim unique olarak kabul ettiğim için
+            //kontrollere göre status dönderdim
             var vProductList = _manager.Get<List<Product>>("products");
 
             if (vProductList != null)
@@ -147,11 +149,10 @@ namespace ProductApiProjectWithRedis.Controllers
 
         }
 
-        // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-
+            //delete işleminde listede varsa silme işlemi gerçekleştirdim
             var vProductList = _manager.Get<List<Product>>("products");
 
             if (vProductList != null)

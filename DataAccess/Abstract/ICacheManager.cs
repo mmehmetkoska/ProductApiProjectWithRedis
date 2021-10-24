@@ -10,7 +10,6 @@ namespace DataAccess.Abstract
     {
         T Get<T>(string key);
         bool Set(string key, object data);
-        bool IsSet(string key);
         bool Remove(string key);
     }
 }
